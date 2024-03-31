@@ -1,3 +1,6 @@
+/**
+Goal of this script is to sketch out the basic shape of our interpreter
+**/
 package lox;
 
 import java.io.BufferedReader;
@@ -8,30 +11,27 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-
 public class Lox
 {
     static boolean hadError = false;
-
     public static void main(String[] args) throws IOException{
         if(args.length > 1){
             System.out.println("Usage: jlox [script]");
-            System.exit(64);
+            System.exit(0); // code exited with no error
         } else if (args.length == 1){
             runFile(args[0]);
         } else {
             runPrompt();
         }
     }
-    //Running jlox from Command line with file argument
+    //Running from Command line with file argument
     private static void runFile(String path) throws IOException{
-        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        byte[] bytes = Files.readAllBytes(Paths.get(path)); // convert string to bytes by getting its path in memory
         run(new String(bytes, Charset.defaultCharset()));
-
-        //Indicate an error in the exit code
-        if(hadError) System.exit(65);
+        //Indicate an error in the exit code return 1
+        if(hadError) System.exit(1);
     }
-    //Running jlox from Command line with no file argument
+    //Running jlox from Command line with no file arguments
     private static void runPrompt() throws IOException{
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
@@ -45,15 +45,17 @@ public class Lox
         }
     }
 
+    //Core function
     private static void run(String source){
-        Scanner scanner = new Scanner(source);
-        List<Token> tokens = scanner.scanTokens();
+        Scanner scanner = new Scanner(source); //create instance of scanner from the source file
+        List<Token> tokens = scanner.scanTokens(); // find tokens
         //for now, just print the tokens
         for(Token token: tokens){
             System.out.println(token);
         }
     }
-    //Error handling
+
+    //Simple Error handling
     static void error(int line, String message){
         report(line, "", message);
     }
