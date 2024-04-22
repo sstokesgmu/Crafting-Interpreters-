@@ -1,6 +1,6 @@
 package lox;
 
-class AstPrinter implements Expr.Visitor<String> {
+ class AstPrinter implements Expr.Visitor<String> {
     String print(Expr expr) { return expr.accept(this); }
     @Override
     public String visitLiteralExpr(Expr.Literal expr) {
@@ -13,7 +13,7 @@ class AstPrinter implements Expr.Visitor<String> {
     }
     @Override
     public String visitUnaryExpr(Expr.Unary expr) {
-        return parenthesize(expr.infix.lexeme, expr.expression);
+        return parenthesize(expr.operator.toString(), expr.right);
     }
     @Override
     public String visitBinaryExpr (Expr.Binary expr) {

@@ -33,12 +33,13 @@ abstract class Expr {
         final Expr expression;
     }
     static class Unary extends Expr {
-        Unary (Token infix, Expr expression ) {
-            this.infix = infix; this.expression = expression;
+        Unary (Token operator, Expr expression ) {
+            this.operator = operator;
+            this.right = expression;
         }
         @Override
         <R> R accept(Visitor<R> visitor) {return visitor.visitUnaryExpr(this);}
-        final Token infix; final Expr expression;
+        final Token operator; final Expr right;
     }
     static class Binary extends Expr {
         Binary (Expr left, Token operator, Expr right) {
