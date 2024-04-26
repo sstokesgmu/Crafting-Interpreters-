@@ -17,23 +17,29 @@ package lox;
     }
     @Override
     public String visitBinaryExpr (Expr.Binary expr) {
-        return parenthesize(expr.operator.lexeme, expr.left, expr.right);
+        return parenthesizeNUM(expr.left, expr.operator, expr.right);
     }
 
     //helper method
     private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("()").append(name);
+        builder.append("Begin: ").append(name);
         for (Expr expr : exprs) {
             builder.append(" ");
             builder.append(expr.accept(this));
         }
-        builder.append(")");
+        builder.append(" :End");
         return builder.toString();
     }
 
-    public static void main(String[] args) {
+    // Binary Operation structure to print the syntax tree correctly
+     private String parenthesizeNUM(Expr left, Token op, Expr right) {
+         return String.format("Begin: %s %s %s :End", left.accept(this), op.lexeme, right.accept(this));
+     }
+
+
+     public static void main(String[] args) {
         Expr expression = new Expr.Binary (new Expr.Unary
                 (new Token(TokenType.MINUS, "-", null, 1),
                         new Expr.Literal(123)),

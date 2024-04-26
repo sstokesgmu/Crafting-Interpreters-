@@ -19,7 +19,6 @@ abstract class Expr {
         R visitBinaryExpr(Binary expr);
     }
 
-
     static class Literal extends Expr {
         Literal(Object value) { this.value = value; }
         @Override
