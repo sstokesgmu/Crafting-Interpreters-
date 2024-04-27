@@ -2,6 +2,7 @@ package lox;
 
 import java.util.List;
 import static lox.TokenType.*;
+import java.util.ArrayList;
 import lox.Lox;
 
 class Parser {
@@ -11,7 +12,90 @@ class Parser {
     private static class ParseError extends RuntimeException {}
     /*Constructor:*/  Parser (List<Token> tokens) { this.tokens = tokens; }
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+    private Stmt statement() {
+        if (match(IF)) return ifStatement();
+        if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
+        return expressionStatement();
+    }
+    private Stmt ifStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+        if (match(ELSE)) { elseBranch = statement(); }
+        return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+
+    private Stmt declaration() {
+        try {
+            if(match(VAR)) return varDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+    }
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Expression(expr);
+    }
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
+    }
+    private Expr assignment(){
+        Expr expr = or();
+        if (match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
+    }
+    private Expr or() {
+        Expr expr = and();
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+        return expr;
+    }
+    private Expr and() {
+        Expr expr = equality();
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+        return expr;
+    }
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Except variable name.");
+        Expr initializer = null;
+        if (match(EQUAL)) initializer = expression();
+        consume (SEMICOLON, "Except ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
     }
     private Expr equality() {
         Expr expr = comparison();
@@ -22,6 +106,7 @@ class Parser {
         }
         return expr;
     }
+
     private Expr comparison() {
         Expr expr = term();
 
@@ -65,8 +150,9 @@ class Parser {
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NUL)) return new Expr.Literal(null);
 
-        if (match(NUMBER, STRING)) {
-            return new Expr.Literal(previous().literal); }
+        if (match(NUMBER, STRING)) {return new Expr.Literal(previous().literal); }
+        if(match(IDENTIFIER)) {return new Expr.Variable(previous());}
+
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -116,8 +202,9 @@ class Parser {
         }
         advance();
     }
-    Expr parse() {
-        try { return expression(); }
-        catch (ParseError error) { return null; }
-        }
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {statements.add(declaration()); }
+        return statements;
+    }
 }

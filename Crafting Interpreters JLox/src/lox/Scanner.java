@@ -165,7 +165,7 @@ class Scanner{
         TokenType type = keywords.get(text); //return text that matches an option in the hash map contianer
         if (type == null) // true -> value is a user defined indentifier
             type = IDENTIFIER;
-        addToken(IDENTIFIER);
+        addToken(type);  // Add the token to the list with the determined type
     }
     private boolean isAlpha(char c) { //checks value using ASCII character chart
         return  (c >= 'a' && c <= 'z') ||

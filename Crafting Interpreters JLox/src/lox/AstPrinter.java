@@ -7,6 +7,14 @@ package lox;
         if(expr.value == null) return "nul";
         return expr.value.toString();
     }
+     @Override
+     public String visitAssignExpr(Expr.Assign expr) {
+         return parenthesize("=",  expr.value);
+     }
+     @Override
+     public String visitVariableExpr(Expr.Variable expr) {
+        return expr.name.lexeme;
+     }
     @Override
     public String visitGroupingExpr(Expr.Grouping expr) {
         return parenthesize("group", expr.expression);
@@ -37,7 +45,6 @@ package lox;
      private String parenthesizeNUM(Expr left, Token op, Expr right) {
          return String.format("Begin: %s %s %s :End", left.accept(this), op.lexeme, right.accept(this));
      }
-
 
      public static void main(String[] args) {
         Expr expression = new Expr.Binary (new Expr.Unary

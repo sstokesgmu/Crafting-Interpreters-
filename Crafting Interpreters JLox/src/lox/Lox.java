@@ -53,12 +53,12 @@ public class Lox
         Scanner scanner = new Scanner(source); //create instance of scanner from the source file
         List<Token> tokens = scanner.scanTokens(); // find tokens
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         if (hadError) return;
 
-        interpreter.interpret(expression);
-        System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(statements);
+        //System.out.println(new AstPrinter().print(expression));
     }
 
     //Simple Error handling

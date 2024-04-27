@@ -1,6 +1,5 @@
-package lox.tools;
+package tools;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +12,21 @@ public class GenerateAst {
         }
         String outputDir = args[0];
         defineAst(outputDir, "Expr", Arrays.asList(
+                "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",
                 "Grouping : Expr expression",
                 "Literal  : Object value",
+                "Variable : Token name",
+                "Logical  : Expr left, Token operator, Expr right",
                 "Unary    : Token operator, Expr right"
+        ));
+
+        defineAst(outputDir, "Stmt", Arrays.asList(
+                "Block      : List<Stmt> Statements",
+                "Print      : Expr expression",
+                "If         : Expr condition, Stmt thenBranch," + " Stmt elseBranch",
+                "Expression : Expr expression",
+                "Var        : Token name, Expr initializer"
         ));
     }
     private static void defineAst (String outputDir, String baseName, List<String> types)
@@ -24,7 +34,7 @@ public class GenerateAst {
             String path = outputDir + "/" + baseName + ".java";
             PrintWriter writer = new PrintWriter (path, "UTF-8");
 
-            writer.println("package com.craftinginterpreters.lox");
+            writer.println("package lox;");
             writer.println();
             writer.println("import java.util.List;");
             writer.println();
