@@ -2,6 +2,7 @@ package lox;
 
 import java.util.List;
 import static lox.TokenType.*;
+import java.util.Arrays;
 import java.util.ArrayList;
 import lox.Lox;
 
@@ -15,8 +16,10 @@ class Parser {
         return assignment();
     }
     private Stmt statement() {
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if(match(WHILE))  return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
     }
@@ -29,6 +32,43 @@ class Parser {
         Stmt elseBranch = null;
         if (match(ELSE)) { elseBranch = statement(); }
         return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Except '(' after 'for'.");
+
+        Stmt initializer;
+        if (match(SEMICOLON)) { initializer  = null; }
+        else if (match(VAR)) { initializer = varDeclaration (); }
+        else { initializer = expressionStatement(); }
+
+        Expr condition = null;
+        if (!check(SEMICOLON)) { condition = expression(); }
+        consume (SEMICOLON, "Except ';' after loop condition.");
+
+
+        Expr increment = null;
+        if (!check(RIGHT_PAREN)) {
+            increment = expression();
+        }
+        consume (RIGHT_PAREN,"Except ')' after for clauses." );
+        Stmt body = statement();
+
+
+        if (condition == null) condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+        if (increment != null) {
+            body = new Stmt.Block(Arrays.asList(initializer, body ));
+        }
+        return body;
+    }
+    private Stmt whileStatement() {
+        consume (LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Stmt body = statement();
+
+        return new Stmt.While(condition, body);
     }
 
     private Stmt declaration() {

@@ -80,7 +80,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         executeBlock(stmt.statements, new Environment(environment));
         return null;
     }
-    @Override
+    @Override()
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
         return null;
@@ -108,6 +108,14 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             execute(stmt.thenBranch);
         } else if (stmt.elseBranch != null) {
             execute(stmt.elseBranch);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitWhleStmt(Stmt.While stmt) {
+        while (isTruthy(evaluate(Stmt.condition))) {
+            execute(stmt.body);
         }
         return null;
     }
