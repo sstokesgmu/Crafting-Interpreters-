@@ -7,6 +7,7 @@ package lox;
         if(expr.value == null) return "nul";
         return expr.value.toString();
     }
+
      @Override
      public String visitAssignExpr(Expr.Assign expr) {
          return parenthesize("=",  expr.value);
@@ -23,7 +24,13 @@ package lox;
     public String visitUnaryExpr(Expr.Unary expr) {
         return parenthesize(expr.operator.toString(), expr.right);
     }
-    @Override
+
+     @Override
+     public String visitLogicalExpr(Expr.Logical expr) {
+         return null;
+     }
+
+     @Override
     public String visitBinaryExpr (Expr.Binary expr) {
         return parenthesizeNUM(expr.left, expr.operator, expr.right);
     }
