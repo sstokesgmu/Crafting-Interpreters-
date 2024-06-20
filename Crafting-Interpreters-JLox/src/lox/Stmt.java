@@ -94,4 +94,17 @@ abstract class Stmt {
    final List<Stmt> body;
   }
  abstract <R> R accept(Visitor<R> visitor);
+
+ static class Return extends Stmt {
+  Return(Token keyword, Expr value){
+   this.keyword = keyword;
+   this.value = value;
+  }
+  @Override
+  <R> R accept(Visitor<R> visitor) { return visitReturnStmt(this);}
+  final Token keyword;
+  final Expr value;
+ }
+
+
 }

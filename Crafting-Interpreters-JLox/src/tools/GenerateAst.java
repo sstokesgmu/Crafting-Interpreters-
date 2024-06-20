@@ -22,6 +22,7 @@ public class GenerateAst {
                 "Unary    : Token operator, Expr right"
         ));
 
+        //! Might need to restructure the Array List to fit call structure
         defineAst(outputDir, "Stmt", Arrays.asList(
                 "Block      : List<Stmt> Statements",
                 "Print      : Expr expression",
@@ -30,6 +31,7 @@ public class GenerateAst {
                               " List<Stmt> body",
                 "If         : Expr condition, Stmt thenBranch," + " Stmt elseBranch",
                 "While      : Expr condition, Stmt body",
+                "Return     : Token keyword, Expr value",
                 "Var        : Token name, Expr initializer"
         ));
     }
